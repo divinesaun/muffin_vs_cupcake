@@ -14,7 +14,7 @@ y = train_df["Type"].replace({"Cupcake": 0, "Muffin": 1})
 from sklearn.ensemble import RandomForestClassifier
 
 
-rnd_clf = RandomForestClassifier(n_estimators=10, random_state=42).fit(X, y)
+rnd_clf = RandomForestClassifier(n_estimators=10, random_state=42).fit(np.array(X), y)
 
 import joblib
 

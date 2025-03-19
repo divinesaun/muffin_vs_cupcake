@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from .serializers import Data
 import warnings
 warnings.filterwarnings("ignore")
-
+import pandas as pd
+from rest_framework import status
 
 def index(request):
     return render(request, "base.html", {"prediction": "None"})
@@ -29,19 +30,9 @@ def prediction_api(request):
     if request.method == "POST":
         serializer = Data(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        flour = serializer.data["Flour"]
-        milk = serializer.data["Milk"]
-        sugar = serializer.data["Sugar"]
-        butter = serializer.data["Butter"]
-        egg = serializer.data["Egg"]
-        baking_powder = serializer.data["Baking_Powder"]
-        vanilla = serializer.data["Vanilla"]
-        salt = serializer.data["Salt"]
-
         model = joblib.load("ml_components/model.joblib")
-        prediction = model.predict([[flour, milk, sugar, butter, egg, baking_powder, vanilla, salt]])
-        return Response("The recipe is for a Cupcake") if prediction == 0 else Response("The recipe is for a Muffin")
+        prediction = model.predict(pd.DataFrame([serializer.data]))
+        return Response({"Result": "The recipe is for a Cupcake"}, status=status.HTTP_202_ACCEPTED) if prediction == 0 else Response(f"The recipe is for a Muffin")
     elif request.method == "GET":
         return Response(
                             {
@@ -55,6 +46,7 @@ def prediction_api(request):
                                 "Salt": 0
                             }
                         )
+
 
 
 
